@@ -1,24 +1,36 @@
-const envConfig = require('dotenv').config();
+const monk = require('monk');
 const Log = require('./logUtil');
 
 
 class DatabaseConfiguration {
-  constructor() {
+  constructor(cfgOptions = process.env) {
+    this.envConfig = cfgOptions;
     this.log = Log.init('DatabaseConfiguartion');
     this.readUser = {
-      name: envConfig.DB_USER_READ,
-      pwd: envConfig.DB_USER_READ_PWD
+      name: this.envConfig.DB_USER_READ,
+      pwd: this.envConfig.DB_USER_READ_PWD
     };
     this.adminUser = {
-      name: envConfig.DB_USER_ADMIN,
-      pwd: envConfig.DB_USER_ADMIN_PWD
+      name: this.envConfig.DB_USER_ADMIN,
+      pwd: this.envConfig.DB_USER_ADMIN_PWD
     };
-    this.URI = envConfig.DB_URI;
-    this.DBName = envConfig.DB_NAME; 
+    this.URI = this.envConfig.DB_URI;
+    this.DBName = this.envConfig.DB_NAME; 
   }
 
   static init() {
     return new DatabaseConfiguration();
+  }
+
+  getDB(connectionType) {
+    return new Promise((resolve, reject) => {
+      const { name, pwd } = (connectionType === 'write') ? this.adminUser : this.readUser;
+      const db = monk(this.getConnectionString(name, pwd));
+      db.then(() => {
+        resolve(db);
+      })
+      .catch(err => reject(err));
+    });
   }
 
   getConnectionString(name, pwd) {
