@@ -15,6 +15,7 @@ log.debug(dbConfig.getReadConnectionString());
 
 const indexRouter = require('./server/routes/index');
 const usersRouter = require('./server/routes/users');
+const rolesRouter = require('./server/routes/roles');
 
 const app = express();
 
@@ -32,6 +33,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cache.getMiddleware());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/roles', rolesRouter);
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

@@ -1,33 +1,35 @@
-const getUsers = () => {
-    fetch('/users/get').then(res => res.json())
+const getRoles = () => {
+    fetch('/roles/get').then(res => res.json())
                    .then(json => {
-                    document.querySelector('ul').innerHTML = json.map(({ _id: id, name }) => `<li>${name} - <span class="delete" data-id="${id}">X</span></li>`).join('');
+                    document.querySelector('ul').innerHTML = json.map(({ _id: id, name, desc }) => `<li>${name} - ${desc} - <span class="delete" data-id="${id}">X</span></li>`).join('');
                    });
 };
 
-const addUser = () => {
+const addRole = () => {
     const { value: name } = document.querySelector('#txtName');
-    fetch('/users/add', {
+    const { value: desc } = document.querySelector('#txtDesc');
+    fetch('/roles/add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            user: {
-               name 
+            role: {
+               name,
+               desc 
             }
         })
     })
     .then(res => res.json())
     .then(json => {
         console.log(JSON.stringify(json));
-        getUsers();
+        getRoles();
     })
     .catch(err => console.log(err));
 };
 
-const deleteUser = (id) => {
-    fetch('/users/delete', {
+const deleteRole = (id) => {
+    fetch('/roles/delete', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -39,19 +41,19 @@ const deleteUser = (id) => {
     .then(res => res.json())
     .then(json => {
         console.log(JSON.stringify(json));
-        getUsers();
+        getRoles();
     })
     .catch(err => console.log(err));
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    getUsers();
-    document.querySelector('.add').addEventListener('click', addUser);
+    getRoles();
+    document.querySelector('.add').addEventListener('click', addRole);
 });
 
 document.addEventListener('click', ({ target }) => {
     if (target.matches('.delete')) {
         const { dataset: { id } } = target;
-        deleteUser(id);
+        deleteRole(id);
     }
 });

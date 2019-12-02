@@ -62,6 +62,13 @@ class Cache {
         return (req, res, next) => {
             if (this.useCaching === false) {
                 next();
+                return;
+            }
+            // this.log.debug(`${req.url} - ${req.method}`);
+            if (req.method !== 'GET') {
+                this.log.debug(`Request - ${req.url} is not of type GET`);
+                next();
+                return;
             }
 
             const key = encodeURI(req.url);
@@ -80,6 +87,16 @@ class Cache {
                 };
                 next();
             }
+        };
+    }
+
+    /**
+     * Insert this middleware to prevent a route from being cached. 
+     */
+    static getNoCacheMiddleware() {
+        return (req, res, next) => {
+            req.useCaching = false;
+            next();
         };
     }
 
