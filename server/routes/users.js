@@ -26,15 +26,17 @@ router.get('/get', [Cache.getNoCacheMiddleware(), (req, res, next) => {
             db.get('users')
               .find()
               .then(users => {
-                log.debug(JSON.stringify(users));
+                log.debug(() => JSON.stringify(users));
                 res.send(JSON.stringify(users));
-              });          
+              })
+              .catch(err => next(err))
+              .then(() => db.close());          
           })
           .catch(err => next(err));
 }]);
 
 router.post('/add', (req, res, next) => {
-  log.debug(JSON.stringify(req.body));
+  log.debug(() => JSON.stringify(req.body));
   const { user } = req.body;
   if (user) {
     dbConfig.getDB('write').then(({ db }) => {
@@ -44,16 +46,17 @@ router.post('/add', (req, res, next) => {
                 .then(result => {                                
                   res.send(JSON.stringify(result));                  
                 })
-                .catch(err => next(err));
+                .catch(err => next(err))
+                .then(() => db.close());
     })
     .catch(err => next(err));
   }
 });
 
 router.post('/delete', (req, res, next) => {
-  log.debug(JSON.stringify(req.body));
+  log.debug(() => JSON.stringify(req.body));
   const { id } = req.body;
-  log.debug(`Request to delete ${id}`);
+  log.debug(() => `Request to delete ${id}`);
   if (id) {
     dbConfig.getDB('write')
             .then(({ db }) => {
@@ -62,7 +65,8 @@ router.post('/delete', (req, res, next) => {
                 .then(result => {
                   res.send(result);
                 })
-                .catch(err => next(err));
+                .catch(err => next(err))
+                .then(() => db.close());
             })
             .catch(err => next(err));
   } else {

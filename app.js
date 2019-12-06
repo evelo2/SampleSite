@@ -5,7 +5,11 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 require('dotenv').config();
 
-const log = require('./server/util/logUtil').init('app');
+const Log = require('./server/util/logUtil');
+
+const log = Log.init('app');
+// Log.addWriter((level, msg) => console.log(`Testing - ${level} : ${msg}`));
+
 
 // const cacheData = {};
 const cache = require('./server/util/cache').init();
